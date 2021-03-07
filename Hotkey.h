@@ -5,8 +5,6 @@
 #include <nana/gui.hpp>
 #include <nana/gui/timer.hpp>
 
-//#include <iostream>
-
 class Hotkey {
 private:
 	void SendCopyInputs();
@@ -26,7 +24,7 @@ public:
         if (RegisterHotKey(hwnd, 1, MOD_CONTROL | MOD_SHIFT | MOD_NOREPEAT, VK_F5)) {
 
             if (AddClipboardFormatListener(hwnd)) {
-                sc.make_before(WM_HOTKEY, [&](UINT, WPARAM, LPARAM, LRESULT*) {
+                sc.make_before(WM_HOTKEY, [=](UINT, WPARAM, LPARAM, LRESULT*) {
                     if (!hotkeyalreadypressed.started()) {
                         hotkeyalreadypressed.start();
                         cbbk.Backup();
@@ -36,9 +34,8 @@ public:
                     return true;
                     });
                 // if the event triggers right in between at least this is fast
-                sc.make_after(WM_CLIPBOARDUPDATE, [&](UINT, WPARAM, LPARAM, LRESULT*) {
+                sc.make_after(WM_CLIPBOARDUPDATE, [=](UINT, WPARAM, LPARAM, LRESULT*) {
                     if (itismyctrlc) {
-                        //std::cout << "Received MY clipboard update" << std::endl;
                         itismyctrlc = false;
                         lambda();
                         cbbk.Restore();
