@@ -31,8 +31,8 @@ inline bool KeyIsDown(WORD key) {
     return GetAsyncKeyState(VK_CONTROL) & 0x01;
 }
 
-Hotkey::Hotkey(nana::form& fm) :
-    sc(fm),
+Hotkey::Hotkey(nana::form& fm, subclass& subc) :
+    sc(subc),
     hwnd(reinterpret_cast<HWND>(fm.native_handle())),
     itismyctrlc(false),
     hotkeyalreadypressed(std::chrono::milliseconds{ 5 })

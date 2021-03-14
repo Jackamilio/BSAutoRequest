@@ -9,14 +9,14 @@ class Hotkey {
 private:
 	void SendCopyInputs();
 
-	subclass sc;
+	subclass& sc;
     HWND hwnd;
 	bool itismyctrlc;
     nana::timer hotkeyalreadypressed;
     CClipboardBackup cbbk;
 public:
 
-	Hotkey(nana::form& fm);
+	Hotkey(nana::form& fm, subclass& subc);
 
 	template<typename Function>
 	bool Register(Function&& lambda) {

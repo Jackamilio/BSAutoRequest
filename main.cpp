@@ -9,6 +9,7 @@
 #include <nana/gui/timer.hpp>
 #include <nana/paint/image.hpp>
 #include <nana/gui/notifier.hpp>
+#include <nana/gui/widgets/menu.hpp>
 
 #include "resource.h"
 #include <string>
@@ -21,23 +22,49 @@
 #include "Config.h"
 #include "Requests.h"
 #include "Hotkey.h"
+#include "subclass.h"
 
 using namespace nana;
 
 int main()
 {
     // Define a form.
-    form fm;
+    form fm{ API::make_center(300, 200), nana::appearance(true,true,false,false,true,false,false) };
     fm.caption("BS Auto Request");
 
     std::string apppath = GetAppPath();
 
     fm.icon(paint::image(apppath));
 
+    // Unsupported events from nana
+    subclass sc(fm);
+
+    // Wanted behavior : the close button removes the program from the taskbar and stays in tray
+    sc.make_before(WM_CLOSE, [&fm](UINT, WPARAM, LPARAM, LRESULT*) {
+        fm.hide();
+        return false;
+        });
+
+    // Menu that gives the option to quit, replaces the close button. Used by the sys tray
+    nana::menu exitmenu;
+    exitmenu.append("Exit", [&fm](menu::item_proxy& ip) {
+        fm.close();
+        });
+
     // Sys tray icon
     notifier tray(fm);
     tray.icon(apppath);
     tray.text("BS Auto Request");
+    tray.events().mouse_up([&fm,&exitmenu](const arg_notifier& arg) {
+        // Bring back the window on left click
+        if (arg.left_button) {
+            fm.bring_top(true);
+        }
+        // Give the exit menu on close
+        else if (arg.right_button) {
+            exitmenu.popup(fm, arg.pos.x - fm.pos().x, arg.pos.y - fm.pos().y);
+        }
+        });
 
     //Label for user feedback
     Feedback feedback{ fm };
@@ -85,7 +112,7 @@ int main()
     });
 
     // React to hotkey even when minimised
-    Hotkey hk(fm);
+    Hotkey hk(fm,sc);
     hk.Register([&] { paste(); tryRequest(); });
 
     // react to pressing enter
@@ -129,11 +156,6 @@ int main()
 
     //Show the form
     fm.show();
-
-    //Prevent the user from resizing, so lock the size to the generated size
-    size s = fm.size();
-    API::track_window_size(fm, s, false);
-    API::track_window_size(fm, s, true);
 
     //Start to event loop process, it blocks until the form is closed.
     exec();
