@@ -1,22 +1,45 @@
 #pragma once
 
 #include <filesystem>
+#include <map>
 #include "json.hpp"
 
 class Config {
-private:
-    nlohmann::json json;
+public:
+    enum class StringVars { bsfolderpath };
+    enum class NumVars { hotkeycode };
+    enum class BoolVars { hotkeyenabled, hotkeyctrl, hotkeyshift, hotkeyalt };
 
-    static const inline std::filesystem::path configpath() {
-        return std::filesystem::path{ "bsautorequest.config" };
-    }
+private:
+    std::filesystem::path configpath;
+    nlohmann::json json;
+    bool needsave;
+
+    std::map<StringVars, std::string> strDefaults;
+    std::map<NumVars, double> numDefaults;
+    std::map<BoolVars, bool> boolDefaults;
+
+    bool setNum(const NumVars nv, double val);
+    double getNum(const NumVars nv) const;
+
+public:
+    Config(const std::filesystem::path& filename);
 
     void save();
 
-public:
-    Config();
+    // getters
+    bool getBool(const BoolVars bv) const;
+    std::string getStr(const StringVars sv) const;
+    template<typename T>
+    T getNumAs(const NumVars nv) const {
+        return (T)getNum(nv);
+    }
 
-    void setBSPath(const std::filesystem::path& path);
-    std::filesystem::path getBSPath() const;
-    std::filesystem::path getJsonPath() const;
+    // setters : returns if the value was different then changed
+    bool setStr(const StringVars sv, const std::string& val);
+    bool setBool(const BoolVars bv, bool val);
+    template<typename T>
+    bool setNumAs(const NumVars nv, const T& val) {
+        return setNum(nv, (double)val);
+    }
 };

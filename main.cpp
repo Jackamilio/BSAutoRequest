@@ -5,7 +5,6 @@
 #include <nana/gui/widgets/button.hpp>
 #include <nana/gui/widgets/textbox.hpp>
 #include <nana/paint/graphics.hpp>
-#include <nana/gui/filebox.hpp>
 #include <nana/gui/timer.hpp>
 #include <nana/paint/image.hpp>
 #include <nana/gui/notifier.hpp>
@@ -18,70 +17,62 @@
 
 #include "utils.h"
 
-#include "Feedback.h"
-#include "Config.h"
-#include "Requests.h"
-#include "Hotkey.h"
-#include "subclass.h"
+#include "Globals.h"
+#include "HotkeyTemplate.h"
+#include "Settings.h"
 
 using namespace nana;
 
 int main()
 {
+    Globals g;
     // Define a form.
-    form fm{ API::make_center(300, 200), nana::appearance(true,true,false,false,true,false,false) };
-    fm.caption("BS Auto Request");
+    g.fm.caption("BS Auto Request");
 
     std::string apppath = GetAppPath();
 
-    fm.icon(paint::image(apppath));
-
-    // Unsupported events from nana
-    subclass sc(fm);
+    g.fm.icon(paint::image(apppath));
 
     // Wanted behavior : the close button removes the program from the taskbar and stays in tray
-    sc.make_before(WM_CLOSE, [&fm](UINT, WPARAM, LPARAM, LRESULT*) {
-        fm.hide();
+    g.sc.make_before(WM_CLOSE, [&g](UINT, WPARAM, LPARAM, LRESULT*) {
+        g.fm.hide();
         return false;
         });
 
     // Menu that gives the option to quit, replaces the close button. Used by the sys tray
     nana::menu exitmenu;
-    exitmenu.append("Exit", [&fm](menu::item_proxy& ip) {
-        fm.close();
+    exitmenu.append("Exit", [&g](menu::item_proxy& ip) {
+        g.fm.close();
         });
 
     // Sys tray icon
-    notifier tray(fm);
+    notifier tray(g.fm);
     tray.icon(apppath);
     tray.text("BS Auto Request");
-    tray.events().mouse_up([&fm,&exitmenu](const arg_notifier& arg) {
+    tray.events().mouse_up([&g,&exitmenu](const arg_notifier& arg) {
         // Bring back the window on left click
         if (arg.left_button) {
-            fm.bring_top(true);
+            g.fm.bring_top(true);
         }
         // Give the exit menu on close
         else if (arg.right_button) {
-            exitmenu.popup(fm, arg.pos.x - fm.pos().x, arg.pos.y - fm.pos().y);
+            exitmenu.popup(g.fm, arg.pos.x - g.fm.pos().x, arg.pos.y - g.fm.pos().y);
         }
         });
 
     //Label for user feedback
-    Feedback feedback{ fm };
-    feedback.format(true);
-
-    Requests requests(feedback);
+    g.feedback.format(true);
 
     //Box to put BSR text
     paint::font bigfont("", 32, detail::font_style(800, false, false, false));
-    textbox tbox{ fm };
+    textbox tbox{ g.fm };
     tbox.multi_lines(false);
     tbox.typeface(bigfont);
     auto cleartbox = [&tbox] {tbox.select(true); tbox.del(); };
 
     //Function to add request
     auto tryRequest = [&] {
-        if (requests.AddAutoRequest(tbox.text())) {
+        if (g.req.AddAutoRequest(tbox.text())) {
             cleartbox();
         }
     };
@@ -100,7 +91,7 @@ int main()
     };
 
     // react to ctrl+v globally, even if the tbox doesn't have focus
-    fm.keyboard_accelerator(accel_key{'v', false, false, true, false}, [&] {
+    g.fm.keyboard_accelerator(accel_key{'v', false, false, true, false}, [&] {
         paste();
     });
 
@@ -112,8 +103,9 @@ int main()
     });
 
     // React to hotkey even when minimised
-    Hotkey hk(fm,sc);
-    hk.Register([&] { paste(); tryRequest(); });
+    Hotkey hk(g);
+    hk.SetLambda([&] { paste(); tryRequest(); });
+    hk.RegisterFromConfig();
 
     // react to pressing enter
     tbox.events().key_press([&](const arg_keyboard& kb) {
@@ -123,39 +115,28 @@ int main()
     });
 
     //Define a button and answer the click event.
-    button btn{ fm, "Submit" };
+    button btn{ g.fm, "Submit" };
     btn.events().click(tryRequest);
 
-    //BS Folder button
-    button folderbtn{ fm, "BS Folder" };
-    folderbtn.events().click([&] {
-            folderbox getfolder{ fm, {folderbox::path_type(requests.config.getBSPath())} };
-            getfolder.allow_multi_select(false);
-            getfolder.title("Please give Beat Saber root folder");
-            std::vector<folderbox::path_type> paths = getfolder.show();
-            if (paths.empty()) {
-                if (!requests.CheckJSon()) {
-                    feedback.Error("Error, no BS folder chosen", true);
-                }
-            }
-            else {
-                requests.config.setBSPath(paths[0]);
-                if (requests.CheckJSon()) {
-                    feedback.Success("BS folder set!");
-                }
-            }
+    // Settings button
+    button settingsbtn{ g.fm, "Settings" };
+    //Settings settings(g);
+    settingsbtn.events().click([&g]() {
+        form& fm = form_loader<Settings>()(g);
+        fm.show();
+        API::modal_window(fm);
         });
 
     //Layout management
-    fm.div("vert <weight=24<><><bsfolder>><weight=24><weight=64<><weight=60% input><>><weight=24<><button><>><><weight=32<><weight=80% text><>><>");
-    fm["input"] << tbox;
-    fm["button"] << btn;
-    fm["bsfolder"] << folderbtn;
-    fm["text"] << feedback;
-    fm.collocate();
+    g.fm.div("vert <weight=24<><><settings>><weight=24><weight=64<><weight=60% input><>><weight=24<><button><>><><weight=32<><weight=80% text><>><>");
+    g.fm["input"] << tbox;
+    g.fm["button"] << btn;
+    g.fm["settings"] << settingsbtn;
+    g.fm["text"] << g.feedback;
+    g.fm.collocate();
 
     //Show the form
-    fm.show();
+    g.fm.show();
 
     //Start to event loop process, it blocks until the form is closed.
     exec();

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<nana-creator version="0.30.0">
+	<form mainclass="true" filename="gen_settings" rel_path="true" work_dir="" type="form" name="Gen_settings" enabled="true" caption="Settings" icon="" width="300" height="250" zoom="false" bgcolor="212,208,200" fgcolor="0,0,0" decoration="true" taskbar="false" floating="false" no_activate="true" min="false" max="false" sizable="false" layout="0" margin="5,5,5,5" gap="2">
+		<field type="field" name="MainLayout" weight="-1" layout="1" margin="5,5,5,5" gap="2">
+			<group type="group" name="bsfoldergroup" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" f_size="9" f_weight="400" f_italic="false" f_underline="false" f_strike_out="false" caption="Beat Saber folder" format="false" halign="0" layout="0" weight="60" margin="5,5,5,5" gap="2">
+				<textbox type="textbox" name="bsfoldertbox" enabled="true" bgcolor="255,255,255" fgcolor="0,0,0" f_size="9" f_weight="400" f_italic="false" f_underline="false" f_strike_out="false" weight="80%" caption="" tip_string="" editable="true" line_wrapped="false" multi_lines="false" focus_behavior="0" select_behavior="false" undo_length="30" halign="0" selection="51,153,255" selection_unfocused="240,240,240" selection_text="255,255,255" />
+				<button type="button" name="bsfolderbtn" enabled="true" bgcolor="212,208,200" fgcolor="0,0,0" f_size="9" f_weight="400" f_italic="false" f_underline="false" f_strike_out="false" weight="-1" caption="Set" icon="" enable_pushed="false" pushed="false" transparent="false" />
+			</group>
+			<group type="group" name="hotkeygroup" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" f_size="9" f_weight="400" f_italic="false" f_underline="false" f_strike_out="false" caption="Hotkey" format="false" halign="0" layout="1" weight="-1" margin="5,5,5,5" gap="2">
+				<panel type="panel" name="enablepanel" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" transparent="false" layout="0" weight="25" margin="5,5,5,5" gap="2">
+					<panel type="panel" name="enablepadding" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" transparent="false" layout="0" weight="70" margin="5,5,5,5" gap="2" />
+					<checkbox type="checkbox" name="enablecbx" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" f_size="9" f_weight="400" f_italic="false" f_underline="false" f_strike_out="false" weight="20" caption="" check="false" group="" radio="false" transparent="false" square_bgcolor="[inherited],201,197,190" square_border_color="0,0,0" />
+					<label type="label" name="enablelbl" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" f_size="9" f_weight="400" f_italic="false" f_underline="false" f_strike_out="false" weight="-1" caption="Enable hotkey" format="false" transparent="false" halign="0" valign="0" />
+				</panel>
+				<panel type="panel" name="keysettings" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" transparent="false" layout="0" weight="-1" margin="5,5,5,5" gap="2">
+					<grid type="grid" name="modifiersgrid" weight="-1%" columns="1" rows="3" margin="5,5,5,5" gap="2" collapse="">
+						<panel type="panel" name="ctrlpanel" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" transparent="false" layout="0" weight="-1" margin="5,5,5,5" gap="2">
+							<checkbox type="checkbox" name="ctrlcbx" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" f_size="9" f_weight="400" f_italic="false" f_underline="false" f_strike_out="false" weight="20" caption="" check="false" group="" radio="false" transparent="false" square_bgcolor="[inherited],201,197,190" square_border_color="0,0,0" />
+							<label type="label" name="ctrllbl" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" f_size="9" f_weight="400" f_italic="false" f_underline="false" f_strike_out="false" weight="-1" caption="Control" format="false" transparent="false" halign="0" valign="0" />
+						</panel>
+						<panel type="panel" name="shiftpanel" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" transparent="false" layout="0" weight="-1" margin="5,5,5,5" gap="2">
+							<checkbox type="checkbox" name="shiftcbx" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" f_size="9" f_weight="400" f_italic="false" f_underline="false" f_strike_out="false" weight="20" caption="" check="false" group="" radio="false" transparent="false" square_bgcolor="[inherited],201,197,190" square_border_color="0,0,0" />
+							<label type="label" name="shiftlbl" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" f_size="9" f_weight="400" f_italic="false" f_underline="false" f_strike_out="false" weight="-1" caption="Shift" format="false" transparent="false" halign="0" valign="0" />
+						</panel>
+						<panel type="panel" name="altpanel" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" transparent="false" layout="0" weight="-1" margin="5,5,5,5" gap="2">
+							<checkbox type="checkbox" name="altcbx" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" f_size="9" f_weight="400" f_italic="false" f_underline="false" f_strike_out="false" weight="20" caption="" check="false" group="" radio="false" transparent="false" square_bgcolor="[inherited],201,197,190" square_border_color="0,0,0" />
+							<label type="label" name="altlbl" enabled="true" bgcolor="201,197,190" fgcolor="0,0,0" f_size="9" f_weight="400" f_italic="false" f_underline="false" f_strike_out="false" weight="-1" caption="Alt" format="false" transparent="false" halign="0" valign="0" />
+						</panel>
+					</grid>
+					<field type="field" name="hotkeybtnfield" weight="-1" layout="0" margin="5,5,5,5" gap="2">
+						<button type="button" name="hotkeybtn" enabled="true" bgcolor="212,208,200" fgcolor="0,0,0" f_size="9" f_weight="400" f_italic="false" f_underline="false" f_strike_out="false" weight="-1" caption="Set key" icon="" enable_pushed="false" pushed="false" transparent="false" />
+					</field>
+				</panel>
+			</group>
+		</field>
+	</form>
+</nana-creator>

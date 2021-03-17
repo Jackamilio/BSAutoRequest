@@ -2,32 +2,32 @@
 
 #ifdef NANA_WINDOWS
 
-subclass::subclass(nana::window wd)
+Subclass::Subclass(nana::window wd)
 	: native_(reinterpret_cast<HWND>(nana::API::root(wd))),
 	old_proc_(nullptr)
 {
 }
 
-subclass::~subclass()
+Subclass::~Subclass()
 {
 	clear();
 }
 
-void subclass::make_before(UINT msg, std::function<bool(UINT, WPARAM, LPARAM, LRESULT*)> fn)
+void Subclass::make_before(UINT msg, std::function<bool(UINT, WPARAM, LPARAM, LRESULT*)> fn)
 {
 	lock_guard lock(mutex_);
 	msg_table_[msg].before = std::move(fn);
 	_m_subclass(true);
 }
 
-void subclass::make_after(UINT msg, std::function<bool(UINT, WPARAM, LPARAM, LRESULT*)> fn)
+void Subclass::make_after(UINT msg, std::function<bool(UINT, WPARAM, LPARAM, LRESULT*)> fn)
 {
 	lock_guard lock(mutex_);
 	msg_table_[msg].after = std::move(fn);
 	_m_subclass(true);
 }
 
-void subclass::umake_before(UINT msg)
+void Subclass::umake_before(UINT msg)
 {
 	lock_guard lock(mutex_);
 	auto i = msg_table_.find(msg);
@@ -43,7 +43,7 @@ void subclass::umake_before(UINT msg)
 	}
 }
 
-void subclass::umake_after(UINT msg)
+void Subclass::umake_after(UINT msg)
 {
 	lock_guard lock(mutex_);
 	auto i = msg_table_.find(msg);
@@ -59,7 +59,7 @@ void subclass::umake_after(UINT msg)
 	}
 }
 
-void subclass::umake(UINT msg)
+void Subclass::umake(UINT msg)
 {
 	lock_guard lock(mutex_);
 	msg_table_.erase(msg);
@@ -68,14 +68,14 @@ void subclass::umake(UINT msg)
 		_m_subclass(false);
 }
 
-void subclass::clear()
+void Subclass::clear()
 {
 	lock_guard lock(mutex_);
 	msg_table_.clear();
 	_m_subclass(false);
 }
 
-void subclass::_m_subclass(bool enable)
+void Subclass::_m_subclass(bool enable)
 {
 	lock_guard lock(mutex_);
 
@@ -100,21 +100,21 @@ void subclass::_m_subclass(bool enable)
 	}
 }
 
-bool subclass::_m_call_before(msg_pro& pro, UINT msg, WPARAM wp, LPARAM lp, LRESULT* res)
+bool Subclass::_m_call_before(msg_pro& pro, UINT msg, WPARAM wp, LPARAM lp, LRESULT* res)
 {
 	return (pro.before ? pro.before(msg, wp, lp, res) : true);
 }
 
-bool subclass::_m_call_after(msg_pro& pro, UINT msg, WPARAM wp, LPARAM lp, LRESULT* res)
+bool Subclass::_m_call_after(msg_pro& pro, UINT msg, WPARAM wp, LPARAM lp, LRESULT* res)
 {
 	return (pro.after ? pro.after(msg, wp, lp, res) : true);
 }
 
-LRESULT CALLBACK subclass::_m_subclass_proc(HWND wd, UINT msg, WPARAM wp, LPARAM lp)
+LRESULT CALLBACK Subclass::_m_subclass_proc(HWND wd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	lock_guard lock(mutex_);
 
-	subclass* self = _m_find(wd);
+	Subclass* self = _m_find(wd);
 	if (nullptr == self || nullptr == self->old_proc_)
 		return 0;
 
@@ -135,17 +135,17 @@ LRESULT CALLBACK subclass::_m_subclass_proc(HWND wd, UINT msg, WPARAM wp, LPARAM
 	return res;
 }
 
-subclass* subclass::_m_find(HWND wd)
+Subclass* Subclass::_m_find(HWND wd)
 {
 	lock_guard lock(mutex_);
-	std::map<HWND, subclass*>::iterator i = table_.find(wd);
+	std::map<HWND, Subclass*>::iterator i = table_.find(wd);
 	if (i != table_.end())
 		return i->second;
 
 	return 0;
 }
 
-std::recursive_mutex subclass::mutex_;
-std::map<HWND, subclass*> subclass::table_;
+std::recursive_mutex Subclass::mutex_;
+std::map<HWND, Subclass*> Subclass::table_;
 
 #endif

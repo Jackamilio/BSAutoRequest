@@ -1,8 +1,12 @@
 #include "Requests.h"
-#include "Feedback.h"
+#include "Globals.h"
 
 #include "utils.h"
 #include <fstream>
+
+std::filesystem::path Requests::GetBSPlusJsonPath() const {
+    return std::filesystem::path(g.conf.getStr(Config::StringVars::bsfolderpath) + "\\UserData\\BeatSaberPlus_ChatRequestDB.json");
+}
 
 //removes all the text around the bsr code likely to be put there
 void Requests::FilterString(std::string& bsr) {
@@ -28,7 +32,7 @@ void Requests::FilterString(std::string& bsr) {
     }
 }
 
-Requests::Requests(Feedback& f) : lastcheck(false), feedback(f) {
+Requests::Requests(Globals& globals) : g(globals), lastcheck(false) {
     CheckJSon();
 }
 
@@ -36,14 +40,14 @@ bool Requests::CheckJSon() {
     lastcheck = false;
 
     // first check if the folder exists
-    if (!std::filesystem::exists(config.getBSPath())) {
-        feedback.Error("Please set BS folder first", true);
+    if (!std::filesystem::exists(g.conf.getStr(Config::StringVars::bsfolderpath))) {
+        g.feedback.Error("Please set BS folder first", true);
         return false;
     }
 
     // then check if the file exists
-    if (!std::filesystem::exists(config.getJsonPath())) {
-        feedback.Error("BeatSaberPlus_ChatRequestDB.json not found", true);
+    if (!std::filesystem::exists(GetBSPlusJsonPath())) {
+        g.feedback.Error("BeatSaberPlus_ChatRequestDB.json not found", true);
         return false;
     }
 
@@ -59,11 +63,11 @@ bool Requests::AddAutoRequest(const std::string& bsr) {
 
     if (lastcheck) {
         // parse the json
-        std::ifstream ifs(config.getJsonPath());
+        std::ifstream ifs(GetBSPlusJsonPath());
         nlohmann::json json = nlohmann::json::parse(ifs, nullptr, false, false);
 
         if (json.type() == nlohmann::detail::value_t::discarded) {
-            feedback.Error("Error parsing BeatSaberPlus_ChatRequestDB.json", true);
+            g.feedback.Error("Error parsing BeatSaberPlus_ChatRequestDB.json", true);
             return false;
         }
 
@@ -73,7 +77,7 @@ bool Requests::AddAutoRequest(const std::string& bsr) {
 
         // check the string to be hex characters
         if (!IsStringHex(fbsr)) {
-            feedback.Error("BSR invalid, " + fbsr + " is not a hex value", false);
+            g.feedback.Error("BSR invalid, " + fbsr + " is not a hex value", false);
             return false;
         }
 
@@ -89,15 +93,15 @@ bool Requests::AddAutoRequest(const std::string& bsr) {
             });
 
         // save the new json
-        std::ofstream ofs(config.getJsonPath());
+        std::ofstream ofs(GetBSPlusJsonPath());
         ofs << std::setw(4) << json << std::endl;
 
         // success!
-        feedback.Success("BSR " + fbsr + " added!");
+        g.feedback.Success("BSR " + fbsr + " added!");
         return true;
     }
     else {
-        feedback.InsistOnLastError();
+        g.feedback.InsistOnLastError();
         return false;
     }
 }

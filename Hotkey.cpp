@@ -1,6 +1,7 @@
 #include "Hotkey.h"
 
 #include <Windows.h>
+#include "Globals.h"
 
 #define VK_C 0x43
 
@@ -31,9 +32,8 @@ inline bool KeyIsDown(WORD key) {
     return GetAsyncKeyState(VK_CONTROL) & 0x01;
 }
 
-Hotkey::Hotkey(nana::form& fm, subclass& subc) :
-    sc(subc),
-    hwnd(reinterpret_cast<HWND>(fm.native_handle())),
+Hotkey::Hotkey(Globals& globals) : g(globals),
+    hwnd(reinterpret_cast<HWND>(g.fm.native_handle())),
     itismyctrlc(false),
     hotkeyalreadypressed(std::chrono::milliseconds{ 5 })
 {
@@ -42,4 +42,25 @@ Hotkey::Hotkey(nana::form& fm, subclass& subc) :
                 hotkeyalreadypressed.stop();
             }
         });
+}
+
+void Hotkey::RegisterFromConfig() {
+    UnregisterHotKey(hwnd, 1);
+    RemoveClipboardFormatListener(hwnd);
+
+    if (g.conf.getBool(Config::BoolVars::hotkeyenabled)) {
+        // React to hotkey even when minimised
+        if (RegisterHotKey(hwnd, 1,
+            (g.conf.getBool(Config::BoolVars::hotkeyctrl) ? MOD_CONTROL : 0) |
+            (g.conf.getBool(Config::BoolVars::hotkeyshift) ? MOD_SHIFT : 0) |
+            (g.conf.getBool(Config::BoolVars::hotkeyalt) ? MOD_ALT : 0) |
+                MOD_NOREPEAT,
+            g.conf.getNumAs<UINT>(Config::NumVars::hotkeycode))) {
+
+            if (!AddClipboardFormatListener(hwnd)) {
+                // cancel registration if this fails
+                UnregisterHotKey(hwnd, 1);
+            }
+        }
+    }
 }

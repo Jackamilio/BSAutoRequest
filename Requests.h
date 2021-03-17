@@ -1,19 +1,20 @@
 #pragma once
 
-#include "Config.h"
-class Feedback;
+#include <filesystem>
+class Globals;
 
 class Requests {
 private:
+    Globals& g;
     bool lastcheck;
 
+    std::filesystem::path GetBSPlusJsonPath() const;
+
 public:
-    Config config;
-    Feedback& feedback;
 
     static void FilterString(std::string& bsr);
 
-    Requests(Feedback& f);
+    Requests(Globals& globals);
 
     bool CheckJSon();
     bool AddAutoRequest(const std::string& bsr);

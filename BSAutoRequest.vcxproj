@@ -168,21 +168,28 @@
     <ClCompile Include="ClipboardBackup.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Feedback.cpp" />
+    <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Hotkey.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Requests.cpp" />
-    <ClCompile Include="subclass.cpp" />
+    <ClCompile Include="Settings.cpp" />
+    <ClCompile Include="Subclass.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClipboardBackup.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="Feedback.h" />
+    <ClInclude Include="gen_settings.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="Hotkey.h" />
+    <ClInclude Include="HotkeyTemplate.h" />
     <ClInclude Include="json.hpp" />
+    <ClInclude Include="magic_enum.hpp" />
     <ClInclude Include="Requests.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="subclass.h" />
+    <ClInclude Include="Settings.h" />
+    <ClInclude Include="Subclass.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>

@@ -10,7 +10,7 @@
 #include <Windows.h>
 #include <Winuser.h>
 
-class subclass
+class Subclass
 {
 	struct msg_pro
 	{
@@ -20,8 +20,8 @@ class subclass
 
 	typedef std::lock_guard<std::recursive_mutex> lock_guard;
 public:
-	subclass(nana::window wd);
-	~subclass();
+	Subclass(nana::window wd);
+	~Subclass();
 
 	void make_before(UINT msg, std::function<bool(UINT, WPARAM, LPARAM, LRESULT*)> fn);
 	void make_after(UINT msg, std::function<bool(UINT, WPARAM, LPARAM, LRESULT*)> fn);
@@ -39,7 +39,7 @@ private:
 	static bool _m_call_after(msg_pro& pro, UINT msg, WPARAM wp, LPARAM lp, LRESULT* res);
 private:
 	static LRESULT CALLBACK _m_subclass_proc(HWND wd, UINT msg, WPARAM wp, LPARAM lp);
-	static subclass* _m_find(HWND wd);
+	static Subclass* _m_find(HWND wd);
 
 private:
 	HWND native_;
@@ -47,7 +47,7 @@ private:
 	std::map<UINT, msg_pro> msg_table_;
 
 	static std::recursive_mutex mutex_;
-	static std::map<HWND, subclass*> table_;
+	static std::map<HWND, Subclass*> table_;
 };
 
 #endif
