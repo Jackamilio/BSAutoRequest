@@ -33,10 +33,23 @@ int main()
 
     g.fm.icon(paint::image(apppath));
 
-    // Wanted behavior : the close button removes the program from the taskbar and stays in tray
+    /*
+    * OLD, people complained.
+    // (Wanted behavior : the close button removes the program from the taskbar and stays in tray)
     g.sc.make_before(WM_CLOSE, [&g](UINT, WPARAM, LPARAM, LRESULT*) {
         g.fm.hide();
         return false;
+        });
+    */
+    // New wanted behavior. Close actually CLOSES. Minimize goes to tray.
+    g.sc.make_before(WM_SYSCOMMAND, [&g](UINT nID, WPARAM wp, LPARAM lp, LRESULT*) {
+        if (wp == SC_MINIMIZE) {
+            g.fm.hide();
+            return false;
+        }
+        else {
+            return true;
+        }
         });
 
     // Menu that gives the option to quit, replaces the close button. Used by the sys tray

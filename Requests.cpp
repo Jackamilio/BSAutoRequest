@@ -4,8 +4,22 @@
 #include "utils.h"
 #include <fstream>
 
-std::filesystem::path Requests::GetBSPlusJsonPath() const {
+std::filesystem::path Requests::GetOldBSPlusJsonPath() const {
     return std::filesystem::path(g.conf.getStr(Config::StringVars::bsfolderpath) + "\\UserData\\BeatSaberPlus_ChatRequestDB.json");
+}
+
+std::filesystem::path Requests::GetNewBSPlusJsonPath() const {
+    return std::filesystem::path(g.conf.getStr(Config::StringVars::bsfolderpath) + "\\UserData\\BeatSaberPlus\\ChatRequest\\Database.json");
+}
+
+std::filesystem::path Requests::GetCorrectBSPlusJsonPath() const {
+    // Give the newest if it exists
+    if (std::filesystem::exists(GetNewBSPlusJsonPath())) {
+        return GetNewBSPlusJsonPath();
+    }
+    else {
+        return GetOldBSPlusJsonPath();
+    }
 }
 
 //removes all the text around the bsr code likely to be put there
@@ -46,8 +60,8 @@ bool Requests::CheckJSon() {
     }
 
     // then check if the file exists
-    if (!std::filesystem::exists(GetBSPlusJsonPath())) {
-        g.feedback.Error("BeatSaberPlus_ChatRequestDB.json not found", true);
+    if (!std::filesystem::exists(GetOldBSPlusJsonPath()) && !std::filesystem::exists(GetNewBSPlusJsonPath())) {
+        g.feedback.Error("Neither BeatSaberPlus_ChatRequestDB.json or Database.json was found", true);
         return false;
     }
 
@@ -63,11 +77,11 @@ bool Requests::AddAutoRequest(const std::string& bsr) {
 
     if (lastcheck) {
         // parse the json
-        std::ifstream ifs(GetBSPlusJsonPath());
+        std::ifstream ifs(GetCorrectBSPlusJsonPath());
         nlohmann::json json = nlohmann::json::parse(ifs, nullptr, false, false);
 
         if (json.type() == nlohmann::detail::value_t::discarded) {
-            g.feedback.Error("Error parsing BeatSaberPlus_ChatRequestDB.json", true);
+            g.feedback.Error("Error parsing the BS plus database json", true);
             return false;
         }
 
@@ -93,7 +107,7 @@ bool Requests::AddAutoRequest(const std::string& bsr) {
             });
 
         // save the new json
-        std::ofstream ofs(GetBSPlusJsonPath());
+        std::ofstream ofs(GetCorrectBSPlusJsonPath());
         ofs << std::setw(4) << json << std::endl;
 
         // success!

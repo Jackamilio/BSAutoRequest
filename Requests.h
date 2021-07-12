@@ -8,7 +8,9 @@ private:
     Globals& g;
     bool lastcheck;
 
-    std::filesystem::path GetBSPlusJsonPath() const;
+    std::filesystem::path GetOldBSPlusJsonPath() const;
+    std::filesystem::path GetNewBSPlusJsonPath() const;
+    std::filesystem::path GetCorrectBSPlusJsonPath() const;
 
 public:
 
